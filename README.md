@@ -8,7 +8,7 @@
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone git@github.com:prabhat1417/Kata_Library_Management_System.git
+   git clone git@github.com:prabhat1417/Kata_Library.git
    cd Kata_Library
    ```
 

@@ -11,4 +11,6 @@ router.put('/returnBook/:isbn', libraryController.returnBook);
 
 router.get('/availableBooks', libraryController.availableBooks);
 
+router.get('/allBooks', libraryController.allBooks);
+
 module.exports = router;

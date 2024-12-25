@@ -111,4 +111,54 @@ describe('Library Management', () => {
       expect(response.body).toHaveProperty('message', 'Book not available');
     });
   });
+
+  describe('Return Book', () => {
+    test('should return a book successfully', async () => {
+      const book = new Book({
+        isbn: '12345',
+        title: 'Test Book',
+        author: 'Author A',
+        year: 2023,
+        isAvailable: false,
+      });
+      await book.save();
+
+      const response = await request(app).put(`/api/returnBook/${book.isbn}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Book returned successfully');
+      expect(response.body.book).toHaveProperty('isbn', '12345');
+      expect(response.body.book.isAvailable).toBe(true);
+
+      const updatedBook = await Book.findOne({ isbn: '12345' });
+      expect(updatedBook.isAvailable).toBe(true);
+    });
+
+    test('should fail to return a book that is available', async () => {
+      const book = new Book({
+        isbn: '12345',
+        title: 'Test Book',
+        author: 'Author A',
+        year: 2023,
+        isAvailable: true,
+      });
+      await book.save();
+
+      const response = await request(app).put(`/api/returnBook/${book.isbn}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Book already available');
+
+      const unchangedBook = await Book.findOne({ isbn: '12345' });
+      expect(unchangedBook.isAvailable).toBe(true);
+    });
+
+    test('should return 404 if book with given ISBN does not exist', async () => {
+      const response = await request(app).put('/api/returnBook/99999');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'No book exist with this ISBN');
+    });
+  });
+
 });

@@ -3,7 +3,7 @@ const app = require('../src/app');
 const mongoose = require('mongoose');
 const Book = require('../src/models/Book'); 
 
-describe('Library Management - Add Book', () => {
+describe('Library Management', () => {
   beforeAll(async () => {
     await mongoose.connect(process.env.MONGO_URI);
   });
@@ -17,6 +17,7 @@ describe('Library Management - Add Book', () => {
     await mongoose.disconnect(); 
   });
 
+  describe('Add Book', () => {
   test('should add a book successfully', async () => {
     const bookData = {
       isbn: '12345',
@@ -60,5 +61,54 @@ describe('Library Management - Add Book', () => {
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty('message', 'An error occurred');
   });
+  });
 
+  describe('Borrow Book', () => {
+    test('should borrow a book successfully', async () => {
+      const book = new Book({
+        isbn: '12345',
+        title: 'Test Book',
+        author: 'Author A',
+        year: 2023,
+        isAvailable: true,
+      });
+      await book.save();
+
+      const response = await request(app).put(`/api/borrowBook/${book.isbn}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Book borrowed successfully');
+      expect(response.body.book).toHaveProperty('isbn', '12345');
+      expect(response.body.book.isAvailable).toBe(false);
+
+      const updatedBook = await Book.findOne({ isbn: '12345' });
+      expect(updatedBook.isAvailable).toBe(false);
+    });
+
+    test('should fail to borrow a book that is not available', async () => {
+      const book = new Book({
+        isbn: '12345',
+        title: 'Test Book',
+        author: 'Author A',
+        year: 2023,
+        isAvailable: false,
+      });
+      await book.save();
+
+      const response = await request(app).put(`/api/borrowBook/${book.isbn}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Book not available');
+
+      const unchangedBook = await Book.findOne({ isbn: '12345' });
+      expect(unchangedBook.isAvailable).toBe(false);
+    });
+
+    test('should return 404 if book with given ISBN does not exist', async () => {
+      const response = await request(app).put('/api/borrowBook/99999');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Book not available');
+    });
+  });
 });

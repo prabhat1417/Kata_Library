@@ -72,10 +72,10 @@ npm test -- -t 'Add Book'
 - **Description**: Returns a book using its ISBN.
 
 ### Get all available Books
-- **PUT** `/api/availableBooks`
+- **GET** `/api/availableBooks`
 - **Description**: Return all available books.
 
 ### Get all Books
-- **PUT** `/api/allBooks`
+- **GET** `/api/allBooks`
 - **Description**: Return all books.
 

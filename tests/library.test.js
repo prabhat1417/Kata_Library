@@ -9,8 +9,9 @@ describe('Library Management', () => {
   });
 
   // to clear test data after every tests
+  const allBooks = ['12345','12346','12347']
   afterEach(async () => {
-    await Book.deleteOne({ isbn: '12345' });
+    await Book.deleteMany({ isbn: { $in: allBooks } });
   });
 
   afterAll(async () => {
@@ -159,6 +160,48 @@ describe('Library Management', () => {
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('message', 'No book exist with this ISBN');
     });
+  });
+
+  describe('View Available Books', () => {
+    beforeEach(async () => {
+      const books = [
+        {
+          isbn: '12345',
+          title: 'Test Book 1',
+          author: 'Author A',
+          year: 2022,
+          isAvailable: true,
+        },
+        {
+          isbn: '12346',
+          title: 'Test Book 2',
+          author: 'Author B',
+          year: 2023,
+          isAvailable: true,
+        },
+        {
+          isbn: '12347',
+          title: 'Test Book 3',
+          author: 'Author C',
+          year: 2021,
+          isAvailable: false,
+        },
+      ];
+      await Book.insertMany(books);
+    });
+  
+    test('should return all available books', async () => {
+      const response = await request(app).get('/api/availableBooks');
+  
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('books');
+      expect(response.body.books.length).toBe(2);
+  
+      const titles = response.body.books.map((book) => book.title);
+      expect(titles).toContain('Test Book 1');
+      expect(titles).toContain('Test Book 2');
+    });
+  
   });
 
 });

@@ -9,4 +9,6 @@ router.put('/borrowBook/:isbn', libraryController.borrowBook);
 
 router.put('/returnBook/:isbn', libraryController.returnBook);
 
+router.get('/availableBooks', libraryController.availableBooks);
+
 module.exports = router;

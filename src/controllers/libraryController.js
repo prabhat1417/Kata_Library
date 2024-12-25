@@ -87,8 +87,22 @@ async function returnBook(req, res) {
   }
 }
 
+//Function to return available books
+async function availableBooks(req, res) {
+  try {
+    const books = await Book.find({ isAvailable: true }).lean();
+
+    res.status(200).json({
+        books
+    });
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+}
+
 module.exports = {
   addBook,
   borrowBook,
-  returnBook
+  returnBook,
+  availableBooks
 };

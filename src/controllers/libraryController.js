@@ -56,7 +56,39 @@ async function borrowBook(req, res) {
   }
 }
 
+//Function to return a book
+async function returnBook(req, res) {
+  try {
+    const isbn = req.params.isbn;
+
+    const book = await Book.findOne({ isbn });
+
+    if(!book){
+        return res.status(404).json({
+          message: "No book exist with this ISBN"
+        });
+    }
+
+    if(book.isAvailable){
+        return res.status(404).json({
+          message: "Book already available"
+        });
+    }
+
+    book.isAvailable = true;
+    await book.save();
+
+    res.status(200).json({
+      message: "Book returned successfully",
+      book,
+    });
+  }catch (error) {
+    res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+}
+
 module.exports = {
   addBook,
-  borrowBook
+  borrowBook,
+  returnBook
 };

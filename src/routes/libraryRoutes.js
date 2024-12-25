@@ -7,4 +7,6 @@ router.post('/addBook', libraryController.addBook);
 
 router.put('/borrowBook/:isbn', libraryController.borrowBook);
 
+router.put('/returnBook/:isbn', libraryController.returnBook);
+
 module.exports = router;

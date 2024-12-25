@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post('/addBook', libraryController.addBook);
 
+router.put('/borrowBook/:isbn', libraryController.borrowBook);
+
 module.exports = router;
